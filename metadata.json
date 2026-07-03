@@ -1,0 +1,6 @@
+{
+  "name": "E-commerce Data Extractor",
+  "description": "Analyze and extract structured product details (title, price, and currency) from raw e-commerce HTML using Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
