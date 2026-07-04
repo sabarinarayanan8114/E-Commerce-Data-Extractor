@@ -111,6 +111,49 @@ Ensure all values strictly match the schema descriptions.`;
   return JSON.parse(jsonText);
 }
 
+// ==========================================
+// NEW ROUTE: Proxy Web Scraper via Server Backend
+// ==========================================
+app.post("/api/fetch-url", async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ success: false, error: "URL handles required parameters." });
+    }
+
+    console.log(`[Scraper] Request received to fetch URL: ${url}`);
+
+    // Bypassing automated filters with proper header mimicking
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Cache-Control": "max-age=0"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Target e-commerce site blocked or returned status: ${response.status}`);
+    }
+
+    const htmlContent = await response.text();
+    console.log(`[Scraper] Successfully loaded source payload bytes: ${htmlContent.length}`);
+
+    res.json({
+      success: true,
+      htmlContent: htmlContent
+    });
+
+  } catch (error: any) {
+    console.error("[Scraper API Error]:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to fetch content from the target URL."
+    });
+  }
+});
+
 // API Route for extraction
 app.post("/api/extract", async (req, res) => {
   try {
@@ -485,4 +528,3 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`Production server running on port ${PORT}`);
   });
 }
-
