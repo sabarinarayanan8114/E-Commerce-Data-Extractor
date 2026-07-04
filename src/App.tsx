@@ -1,32 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { SAMPLE_PRODUCTS } from "./samples";
-import { ProductCard } from "./components/ProductCard";
-import { PromptPlayground } from "./components/PromptPlayground";
-import { JsonViewer } from "./components/JsonViewer";
-import { PriceIntelligence } from "./components/PriceIntelligence";
-import { AlertsTracker } from "./components/AlertsTracker";
-import { ProductData, ExtractionResult, ExtractionField, TrackedProduct, AlertLog } from "./types";
-import { 
-  ShoppingBag, Sparkles, Database, Layers, Plus, Trash2, Check, 
-  RefreshCw, FileText, History, ExternalLink, TrendingDown, 
-  LineChart, HelpCircle, Info, CornerDownRight 
-} from "lucide-react";
-
-// Initial fields and standard constants...
-const INITIAL_FIELDS: ExtractionField[] = [
-  { key: "brand", label: "Brand", description: "The manufacturer or brand of the product.", type: "STRING", enabled: true },
-  { key: "rating", label: "Customer Rating", description: "The star rating.", type: "STRING", enabled: true },
-  { key: "reviewCount", label: "Reviews Count", description: "Total number of reviews.", type: "STRING", enabled: true },
-];
+import React, { useState } from "react";
+import { ExternalLink, RefreshCw, Check, AlertCircle } from "lucide-react";
 
 export default function App() {
-  const [appMode, setAppMode] = useState<'extractor' | 'analyst' | 'tracker'>('extractor');
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [isFetchingUrl, setIsFetchingUrl] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // --- NEW: Proxy URL Fetcher ---
   const fetchUrlFromProxy = async () => {
     if (!targetUrl.trim()) {
       setErrorMessage("Please enter a valid product URL.");
@@ -54,45 +34,65 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50/50 p-8">
-      <header className="max-w-7xl mx-auto mb-8">
-        <h1 className="text-2xl font-bold">E-Commerce Intelligence Suite</h1>
+    <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
+      <header className="max-w-4xl mx-auto mb-8">
+        <h1 className="text-2xl font-bold text-neutral-900">E-Commerce Intelligence Suite</h1>
+        <p className="text-sm text-neutral-500">Fetch product data and analyze pricing in real-time.</p>
       </header>
 
-      <main className="max-w-7xl mx-auto bg-white p-6 rounded-2xl border border-neutral-200">
-        {/* NEW: URL Fetcher UI */}
-        <div className="mb-8 p-6 bg-indigo-50/50 rounded-xl border border-indigo-100">
-          <h3 className="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-2">
-            <ExternalLink className="h-4 w-4" /> Import Data via URL
-          </h3>
+      <main className="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-neutral-200 shadow-sm">
+        {/* Fetcher Section */}
+        <div className="space-y-4">
+          <label className="text-sm font-bold text-neutral-700">Enter Product URL</label>
           <div className="flex gap-3">
             <input
               type="text"
               value={targetUrl}
               onChange={(e) => setTargetUrl(e.target.value)}
-              placeholder="Paste product URL (e.g., https://amazon.in/dp/...)"
-              className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg text-sm"
+              placeholder="https://amazon.in/dp/..."
+              className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
             />
             <button
               onClick={fetchUrlFromProxy}
               disabled={isFetchingUrl}
-              className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+              className="px-6 py-2 bg-neutral-900 text-white text-sm font-bold rounded-lg hover:bg-neutral-800 disabled:opacity-50 transition-colors"
             >
-              {isFetchingUrl ? "Fetching..." : "Fetch & Parse"}
+              {isFetchingUrl ? "Fetching..." : "Fetch Data"}
             </button>
           </div>
         </div>
 
-        {/* HTML Input Area */}
-        <div className="space-y-4">
-          <label className="text-sm font-semibold text-neutral-700">Raw HTML Content</label>
-          <textarea
-            value={htmlContent}
-            onChange={(e) => setHtmlContent(e.target.value)}
-            className="w-full h-64 bg-neutral-900 text-neutral-200 font-mono text-xs p-4 rounded-xl"
-            placeholder="HTML will appear here after fetching URL..."
-          />
-        </div>
+        {/* Status Messages */}
+        {errorMessage && (
+          <div className="mt-4 p-3 bg-red-50 text-red-700 text-xs font-bold rounded-lg flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" /> {errorMessage}
+          </div>
+        )}
+
+        {isFetchingUrl && (
+          <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            <span>Fetching product page... please wait a moment.</span>
+          </div>
+        )}
+
+        {htmlContent && !isFetchingUrl && (
+          <div className="mt-4 p-4 bg-green-50 text-green-700 text-xs font-bold rounded-lg flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Check className="h-4 w-4" /> <span>Data successfully fetched!</span>
+            </div>
+            <button className="text-indigo-600 hover:underline font-bold mt-1">
+              Click here to run AI Extraction →
+            </button>
+          </div>
+        )}
+
+        {/* Hidden Field for Data Storage */}
+        <textarea
+          value={htmlContent}
+          className="hidden"
+          readOnly
+        />
       </main>
     </div>
   );
