@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { ExternalLink, RefreshCw, Check, AlertCircle } from "lucide-react";
+import { ExternalLink, RefreshCw, Check, AlertCircle, Sparkles } from "lucide-react";
 
 export default function App() {
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [isFetchingUrl, setIsFetchingUrl] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [extractionResult, setExtractionResult] = useState<any>(null);
 
+  // 1. Fetch HTML from Proxy
   const fetchUrlFromProxy = async () => {
     if (!targetUrl.trim()) {
       setErrorMessage("Please enter a valid product URL.");
@@ -14,6 +17,7 @@ export default function App() {
     }
     setIsFetchingUrl(true);
     setErrorMessage(null);
+    setExtractionResult(null); // Reset previous result
     try {
       const response = await fetch("/api/fetch-url", {
         method: "POST",
@@ -30,6 +34,25 @@ export default function App() {
       setErrorMessage("Network error: " + err.message);
     } finally {
       setIsFetchingUrl(false);
+    }
+  };
+
+  // 2. Run AI Extraction
+  const handleExtraction = async () => {
+    setIsExtracting(true);
+    setErrorMessage(null);
+    try {
+      const response = await fetch("/api/extract-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: htmlContent }),
+      });
+      const data = await response.json();
+      setExtractionResult(data);
+    } catch (error) {
+      setErrorMessage("Extraction failed. Please try again.");
+    } finally {
+      setIsExtracting(false);
     }
   };
 
@@ -72,27 +95,40 @@ export default function App() {
         {isFetchingUrl && (
           <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg flex items-center gap-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            <span>Fetching product page... please wait a moment.</span>
+            <span>Fetching product page... please wait.</span>
           </div>
         )}
 
-        {htmlContent && !isFetchingUrl && (
-          <div className="mt-4 p-4 bg-green-50 text-green-700 text-xs font-bold rounded-lg flex flex-col gap-2">
+        {htmlContent && !isFetchingUrl && !extractionResult && (
+          <div className="mt-4 p-4 bg-green-50 text-green-700 text-xs font-bold rounded-lg flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4" /> <span>Data successfully fetched!</span>
             </div>
-            <button className="text-indigo-600 hover:underline font-bold mt-1">
-              Click here to run AI Extraction →
+            <button 
+              onClick={handleExtraction}
+              disabled={isExtracting}
+              className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isExtracting ? "Extracting with AI..." : "Run AI Extraction"}
             </button>
           </div>
         )}
 
-        {/* Hidden Field for Data Storage */}
-        <textarea
-          value={htmlContent}
-          className="hidden"
-          readOnly
-        />
+        {/* Extraction Results */}
+        {extractionResult && (
+          <div className="mt-8 p-6 bg-neutral-900 rounded-xl">
+            <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-yellow-400" /> Extraction Results
+            </h3>
+            <pre className="text-xs text-green-400 font-mono overflow-x-auto">
+              {JSON.stringify(extractionResult, null, 2)}
+            </pre>
+          </div>
+        )}
+
+        {/* Hidden Field */}
+        <textarea value={htmlContent} className="hidden" readOnly />
       </main>
     </div>
   );
