@@ -254,7 +254,6 @@ export default function App() {
     setAppMode('tracker');
   };
 
-
   // Handle sample selection change
   const handleSampleSelect = (id: string) => {
     setSelectedSampleId(id);
@@ -507,7 +506,6 @@ export default function App() {
         {/* Interactive Walkthrough / Guide Panel */}
         {showGuide ? (
           <div className="bg-white rounded-2xl border border-indigo-150 p-6 shadow-sm relative overflow-hidden bg-gradient-to-r from-white via-indigo-50/10 to-indigo-50/25">
-            {/* Elegant visual badge */}
             <div className="absolute top-0 right-0 h-32 w-32 bg-indigo-50 rounded-full -mr-10 -mt-10 opacity-30 blur-2xl pointer-events-none"></div>
             
             <div className="flex justify-between items-start mb-4">
@@ -608,7 +606,6 @@ export default function App() {
                 </div>
               </div>
             </div>
-
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-neutral-200 p-4 shadow-sm flex items-center justify-between text-xs text-neutral-600">
@@ -626,10 +623,10 @@ export default function App() {
         )}
 
         {appMode === 'extractor' ? (
-          /* Original HTML Extraction Layout */
+          /* HTML Extraction Layout */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* Left Column: Input Panel & Setup (Takes 7 cols) */}
+            {/* Left Column: Input Panel & Setup */}
             <section className="lg:col-span-7 space-y-6">
               
               {/* Template Selector Section */}
@@ -650,10 +647,8 @@ export default function App() {
                       }`}
                     >
                       <div>
-                        <span className={`text-xs font-bold uppercase tracking-wider block mb-1 ${
-                          selectedSampleId === prod.id ? "text-neutral-400" : "text-neutral-400"
-                        }`}>
-                          {prod.id === "echo-dot" ? "USA Store" : prod.id === "boat-rockerz" ? "India Store" : prod.id === "kindle-paperwhite" ? "UK Store" : "Fallback Case"}
+                        <span className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-neutral-400">
+                          {prod.id === "echo-dot" ? "USA Store" : prod.id === "boat-rockerz" ? "India Store" : prod.id === "kindle-paperwhite" ? "UK Store" : "Store Item"}
                         </span>
                         <h3 className={`text-sm font-semibold leading-tight line-clamp-1 ${
                           selectedSampleId === prod.id ? "text-white" : "text-neutral-900"
@@ -696,7 +691,7 @@ export default function App() {
                     value={htmlContent}
                     onChange={(e) => {
                       setHtmlContent(e.target.value);
-                      setSelectedSampleId(""); // deselect sample if edited manually
+                      setSelectedSampleId(""); 
                     }}
                     placeholder="Paste your Amazon product HTML here or select a template above..."
                     className="w-full h-80 bg-neutral-900 text-neutral-200 font-mono text-xs p-4 rounded-xl border border-neutral-800 focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:border-neutral-400 resize-none leading-relaxed"
@@ -708,7 +703,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Character Limit Info */}
                 <div className="text-[11px] text-neutral-500 flex items-center space-x-1">
                   <CornerDownRight className="h-3 w-3 text-neutral-400" />
                   <span>Our server auto-strips scripts/styles and trims text to the first 30,000 characters to optimize parsing cost & speed.</span>
@@ -717,398 +711,333 @@ export default function App() {
 
               {/* Extraction Fields Configuration Schema */}
               <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-sm/5 space-y-4">
-                <div className="flex justify-between items-center pb-2 border-b border-neutral-100">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Database className="h-4.5 w-4.5 text-indigo-500" />
-                    <div>
-                      <h2 className="text-sm font-semibold tracking-tight text-neutral-900">Structured Data Schema Fields</h2>
-                      <p className="text-[11px] text-neutral-500">Configure target keys for Gemini structured JSON extraction</p>
-                    </div>
+                    <Database className="h-4.5 w-4.5 text-neutral-500" />
+                    <h2 className="text-sm font-semibold tracking-tight text-neutral-900">Structured Data Schema Fields</h2>
                   </div>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">
-                    {customFields.filter(f => f.enabled).length + 3} Target Keys
+                  <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider bg-neutral-50 border border-neutral-200 px-2 py-0.5 rounded">
+                    {customFields.filter(f => f.enabled).length} Active Keys
                   </span>
                 </div>
 
-                {/* Helpful explanatory tip */}
-                <div className="bg-indigo-50/40 border border-indigo-100 rounded-xl p-3 text-[11px] text-indigo-950 flex items-start space-x-2.5">
-                  <Info className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                  <p className="leading-relaxed">
-                    <b>What are these keys?</b> They tell Gemini exactly which properties to look for in the HTML code. Core keys are built-in, but you can toggle optional ones on/off or add custom attributes (e.g., <code>primeDelivery</code>, <code>inStock</code>) using the form below.
-                  </p>
-                </div>
+                <p className="text-xs text-neutral-500 leading-normal">
+                  The primary variables (<b>productTitle</b>, <b>currentPrice</b>, <b>currencyCode</b>, and <b>imageUrl</b>) are fixed schemas natively compiled by our parser engine. Add customized key targets below:
+                </p>
 
-                {/* Locked/Default Schema Keys Info */}
-                <div className="bg-neutral-50 border border-neutral-100 rounded-xl p-3 text-xs flex flex-col space-y-2">
-                  <span className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Built-In Core Keys (Always Extracted)</span>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-white border border-neutral-200 rounded-lg p-2 flex flex-col">
-                      <span className="font-mono text-xs font-bold text-neutral-900">productTitle</span>
-                      <span className="text-[10px] text-neutral-500 mt-0.5">String, Name of product</span>
-                    </div>
-                    <div className="bg-white border border-neutral-200 rounded-lg p-2 flex flex-col">
-                      <span className="font-mono text-xs font-bold text-neutral-900">currentPrice</span>
-                      <span className="text-[10px] text-neutral-500 mt-0.5">Float (null if not found)</span>
-                    </div>
-                    <div className="bg-white border border-neutral-200 rounded-lg p-2 flex flex-col">
-                      <span className="font-mono text-xs font-bold text-neutral-900">currencyCode</span>
-                      <span className="text-[10px] text-neutral-500 mt-0.5">3-letter ISO code</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dynamic Optional Fields list */}
-                <div className="space-y-2">
-                  <span className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider block">Custom Optional Keys</span>
-                  
-                  {customFields.length === 0 ? (
-                    <p className="text-xs text-neutral-500 italic py-2 text-center">No optional schema keys configured.</p>
-                  ) : (
-                    <div className="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
-                      {customFields.map((field) => (
-                        <div key={field.key} className="flex items-center justify-between p-3 rounded-xl border border-neutral-150 bg-white hover:border-neutral-200 transition-colors">
-                          <div className="flex items-start space-x-3">
-                            <button
-                              onClick={() => handleToggleField(field.key)}
-                              className="mt-0.5 text-neutral-400 hover:text-neutral-700 transition-colors"
-                            >
-                              {field.enabled ? (
-                                <ToggleRight className="h-6.5 w-6.5 text-neutral-900" />
-                              ) : (
-                                <ToggleLeft className="h-6.5 w-6.5 text-neutral-300" />
-                              )}
-                            </button>
-                            <div>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-mono text-xs font-bold text-neutral-900">{field.key}</span>
-                                <span className="text-[9px] font-semibold bg-neutral-100 text-neutral-600 px-1.5 py-0.2 rounded uppercase">
-                                  {field.type}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-neutral-500 mt-0.5">{field.description}</p>
-                            </div>
-                          </div>
-                          
-                          <button
-                            onClick={() => handleRemoveField(field.key)}
-                            className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Delete Key"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                {/* Grid Lists of Custom fields */}
+                <div className="border border-neutral-100 rounded-xl overflow-hidden divide-y divide-neutral-100 text-xs">
+                  {customFields.map((field) => (
+                    <div key={field.key} className={`p-3.5 flex items-start justify-between gap-4 transition-colors ${field.enabled ? 'bg-white' : 'bg-neutral-50/50 opacity-60'}`}>
+                      <div className="space-y-0.5 max-w-[80%]">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono font-bold text-neutral-900 bg-neutral-100 px-1.5 py-0.5 rounded border border-neutral-200/60">{field.key}</span>
+                          <span className="font-semibold text-neutral-700">— {field.label}</span>
+                          <span className="text-[9px] font-mono font-medium text-neutral-400 bg-neutral-50 border px-1 rounded uppercase">{field.type}</span>
                         </div>
-                      ))}
+                        <p className="text-neutral-500 text-[11px] leading-normal">{field.description}</p>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleField(field.key)}
+                          className="text-neutral-400 hover:text-neutral-900 p-1 rounded transition-colors"
+                          title={field.enabled ? "Disable Field" : "Enable Field"}
+                        >
+                          {field.enabled ? <ToggleRight className="h-5 w-5 text-neutral-900" /> : <ToggleLeft className="h-5 w-5" />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveField(field.key)}
+                          className="text-neutral-400 hover:text-red-600 p-1 rounded transition-colors"
+                          title="Delete Property"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add New Custom Field Form */}
+                <form onSubmit={handleAddField} className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 space-y-3.5">
+                  <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
+                    <h3 className="text-xs font-bold text-neutral-900 flex items-center gap-1.5">
+                      <Plus className="h-3.5 w-3.5" /> Inject Custom Schema Object Target
+                    </h3>
+                  </div>
+
+                  {fieldError && (
+                    <div className="p-2.5 rounded-lg text-[11px] font-medium bg-red-50 border border-red-100 text-red-700 flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{fieldError}</span>
                     </div>
                   )}
-                </div>
 
-                {/* Add Custom Field Form */}
-                <form onSubmit={handleAddField} className="border-t border-neutral-100 pt-4 space-y-3">
-                  <span className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider block">Define New Schema Key</span>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">Key ID (camelCase)</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-neutral-600">Object Key (camelCase)</label>
                       <input
                         type="text"
                         value={newKey}
                         onChange={(e) => setNewKey(e.target.value)}
-                        placeholder="e.g. primeShipping"
-                        className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:border-neutral-400 font-mono"
+                        placeholder="e.g. couponDiscount"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 bg-white focus:outline-none font-mono text-[11px]"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">Display Label</label>
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-neutral-600">Display Label</label>
                       <input
                         type="text"
                         value={newLabel}
                         onChange={(e) => setNewLabel(e.target.value)}
-                        placeholder="e.g. Prime Eligible"
-                        className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:border-neutral-400"
+                        placeholder="e.g. Coupon Applied"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 bg-white focus:outline-none"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">Data Type</label>
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-neutral-600">Value Type</label>
                       <select
                         value={newType}
-                        onChange={(e) => setNewType(e.target.value as any)}
-                        className="w-full text-xs border border-neutral-300 bg-white rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:border-neutral-400"
+                        onChange={(e: any) => setNewType(e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 bg-white focus:outline-none"
                       >
-                        <option value="STRING">String (Text)</option>
-                        <option value="NUMBER">Number (Decimal/Int)</option>
-                        <option value="BOOLEAN">Boolean (True/False)</option>
+                        <option value="STRING">STRING Text</option>
+                        <option value="NUMBER">NUMBER Value</option>
+                        <option value="BOOLEAN">BOOLEAN Condition</option>
                       </select>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">Extraction Rule Description</label>
+                  <div className="space-y-1 text-xs">
+                    <label className="block text-[11px] font-bold text-neutral-600">Target Field Prompt Description instructions</label>
                     <input
                       type="text"
                       value={newDesc}
                       onChange={(e) => setNewDesc(e.target.value)}
-                      placeholder="Instruct Gemini what to extract (e.g. True if Prime logo is present on page)"
-                      className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-2 focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:border-neutral-400"
+                      placeholder="e.g. Look for green checkbox labels containing savings or percentage drops..."
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 bg-white focus:outline-none"
                     />
                   </div>
 
-                  {fieldError && (
-                    <p className="text-xs text-rose-600 font-medium flex items-center gap-1.5 bg-rose-50 p-2 rounded-lg">
-                      <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" /> {fieldError}
-                    </p>
-                  )}
-
-                  <div className="flex justify-end">
+                  <div className="flex justify-end pt-1">
                     <button
                       type="submit"
-                      className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-700 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                      className="px-3 py-1.5 bg-neutral-900 text-white rounded-lg text-[11px] font-bold shadow-sm hover:bg-neutral-800 transition-colors"
                     >
-                      <Plus className="h-3.5 w-3.5" />
-                      <span>Append Schema Key</span>
+                      Append Custom Property Schema
                     </button>
                   </div>
                 </form>
               </div>
 
-              {/* Error Message if any */}
-              {errorMessage && (
-                <div id="error-banner" className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 flex items-start space-x-3 shadow-sm/5">
-                  <AlertTriangle className="h-5 w-5 flex-shrink-0 text-rose-500" />
-                  <div>
-                    <h3 className="text-sm font-semibold">Extraction Interrupted</h3>
-                    <p className="text-xs text-rose-700 mt-1">{errorMessage}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Huge Extract Button */}
-              <div className="flex justify-center pt-2">
+              {/* Primary Extract Action Trigger */}
+              <div className="pt-2">
                 <button
+                  type="button"
                   onClick={handleExtract}
                   disabled={isExtracting}
-                  className="w-full py-4 px-6 bg-neutral-900 hover:bg-neutral-950 text-white rounded-2xl font-semibold shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:bg-neutral-400 disabled:cursor-not-allowed hover:shadow-lg"
+                  className={`w-full py-4 rounded-xl font-bold text-sm tracking-tight shadow-md transition-all flex items-center justify-center gap-2 text-white ${
+                    isExtracting 
+                      ? 'bg-neutral-800 opacity-80 cursor-not-allowed' 
+                      : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99]'
+                  }`}
                 >
                   {isExtracting ? (
                     <>
-                      <RefreshCw className="h-5 w-5 animate-spin" />
-                      <span>Analyzing HTML Content with Gemini AI...</span>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Gemini Live Neural Assembly Parsing in Progress...</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5" />
-                      <span>Run Data Extraction Engine</span>
+                      <Sparkles className="h-4.5 w-4.5" />
+                      <span>Run Structured Data Extraction Engine</span>
                     </>
                   )}
                 </button>
+                {errorMessage && (
+                  <div className="mt-3 p-3.5 rounded-xl bg-red-50 border border-red-100 text-xs font-semibold text-red-700 flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
               </div>
             </section>
 
-            {/* Right Column: Output Tabs & Display (Takes 5 cols) */}
+            {/* Right Column: Structured Output Monitor (Takes 5 cols) */}
             <section className="lg:col-span-5 space-y-6">
-              
-              {/* Display Tabs Controls */}
-              <div className="bg-white rounded-2xl border border-neutral-200 p-2 shadow-sm/5 flex space-x-1">
-                <button
-                  onClick={() => setActiveTab('preview')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold tracking-tight transition-all duration-150 flex items-center justify-center gap-1.5 ${
-                    activeTab === 'preview'
-                      ? "bg-neutral-900 text-white shadow-sm"
-                      : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
-                  }`}
-                >
-                  <ShoppingBag className="h-3.5 w-3.5" />
-                  <span>Visual Card</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('json')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold tracking-tight transition-all duration-150 flex items-center justify-center gap-1.5 ${
-                    activeTab === 'json'
-                      ? "bg-neutral-900 text-white shadow-sm"
-                      : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
-                  }`}
-                >
-                  <Database className="h-3.5 w-3.5" />
-                  <span>JSON Schema</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('prompt')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold tracking-tight transition-all duration-150 flex items-center justify-center gap-1.5 ${
-                    activeTab === 'prompt'
-                      ? "bg-neutral-900 text-white shadow-sm"
-                      : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
-                  }`}
-                >
-                  <Terminal className="h-3.5 w-3.5" />
-                  <span>Prompt</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('history')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold tracking-tight transition-all duration-150 flex items-center justify-center gap-1.5 ${
-                    activeTab === 'history'
-                      ? "bg-neutral-900 text-white shadow-sm"
-                      : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
-                  }`}
-                >
-                  <History className="h-3.5 w-3.5" />
-                  <span>History</span>
-                </button>
-              </div>
+              <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden min-h-[500px] flex flex-col">
+                {/* Internal Output Tab Switcher */}
+                <div className="bg-neutral-50 border-b border-neutral-200 px-4 pt-3 flex space-x-1.5 select-none text-xs">
+                  <button
+                    onClick={() => setActiveTab('preview')}
+                    className={`px-3 py-2 rounded-t-xl font-bold border-t border-x transition-colors ${
+                      activeTab === 'preview'
+                        ? 'bg-white border-neutral-200 text-neutral-950 font-extrabold shadow-[0_-2px_6px_rgba(0,0,0,0.015)]'
+                        : 'bg-transparent border-transparent text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    Visual Card
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('json')}
+                    className={`px-3 py-2 rounded-t-xl font-bold border-t border-x transition-colors ${
+                      activeTab === 'json'
+                        ? 'bg-white border-neutral-200 text-neutral-950 font-extrabold shadow-[0_-2px_6px_rgba(0,0,0,0.015)]'
+                        : 'bg-transparent border-transparent text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    JSON Schema
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('prompt')}
+                    className={`px-3 py-2 rounded-t-xl font-bold border-t border-x transition-colors ${
+                      activeTab === 'prompt'
+                        ? 'bg-white border-neutral-200 text-neutral-950 font-extrabold shadow-[0_-2px_6px_rgba(0,0,0,0.015)]'
+                        : 'bg-transparent border-transparent text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    Generated Prompt
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('history')}
+                    className={`px-3 py-2 rounded-t-xl font-bold border-t border-x transition-colors flex items-center gap-1 ${
+                      activeTab === 'history'
+                        ? 'bg-white border-neutral-200 text-neutral-950 font-extrabold shadow-[0_-2px_6px_rgba(0,0,0,0.015)]'
+                        : 'bg-transparent border-transparent text-neutral-500 hover:text-neutral-800'
+                    }`}
+                  >
+                    History ({history.length})
+                  </button>
+                </div>
 
-              {/* Tab Contents */}
-              <div className="transition-all duration-200">
-                
-                {/* Tab: Visual Card */}
-                {activeTab === 'preview' && (
-                  <div className="space-y-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block px-1">Interactive Product Preview</span>
-                    <ProductCard 
-                      productData={currentResult?.extractedData || null} 
-                      isLoading={isExtracting} 
-                    />
-                    {currentResult?.extractedData && (
-                      <div className="space-y-3">
-                        <div className="bg-white border border-neutral-200 rounded-xl p-4 text-xs space-y-1.5 text-neutral-500">
-                          <div className="flex justify-between">
-                            <span>Parser Strategy:</span>
-                            <b className="text-neutral-800">Structured JSON Output</b>
+                {/* Tab Frame Contents */}
+                <div className="p-5 flex-1 flex flex-col bg-white">
+                  {activeTab === 'preview' && (
+                    <div className="flex-1 flex flex-col justify-between h-full space-y-4">
+                      {currentResult?.extractedData ? (
+                        <>
+                          <ProductCard data={currentResult.extractedData} customSchemaFields={customFields} />
+                          <div className="bg-neutral-50 border border-neutral-200/80 rounded-xl p-4 text-xs space-y-2.5">
+                            <h4 className="font-bold text-neutral-900 flex items-center gap-1.5">
+                              <Terminal className="h-3.5 w-3.5 text-neutral-500" /> Pipeline Operations Bridge
+                            </h4>
+                            <p className="text-neutral-500 text-[11px] leading-normal">
+                              This payload is fully structured. Choose a downstream workflow engine action:
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-sans">
+                              <button
+                                onClick={() => setAppMode('analyst')}
+                                className="w-full px-3 py-2 border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 font-bold rounded-lg transition-colors text-left flex items-center justify-between"
+                              >
+                                <span>Evaluate Price Drop</span>
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                onClick={handleTransferToTracker}
+                                className="w-full px-3 py-2 border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 font-bold rounded-lg transition-colors text-left flex items-center justify-between"
+                              >
+                                <span>Automate 24/7 Alerts</span>
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Clean text length analyzed:</span>
-                            <b className="text-neutral-800">{currentResult.rawInputLength.toLocaleString()} characters</b>
+                        </>
+                      ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-xs text-neutral-400 my-auto space-y-3">
+                          <div className="p-3 bg-neutral-50 text-neutral-300 rounded-full border border-neutral-200/60 shadow-inner">
+                            <Database className="h-6 w-6" />
                           </div>
-                          <div className="flex justify-between">
-                            <span>Extraction timestamp:</span>
-                            <b className="text-neutral-800">{currentResult.timestamp}</b>
+                          <div className="space-y-1 max-w-[280px]">
+                            <p className="font-bold text-neutral-700">No Extracted Data Sample Loaded</p>
+                            <p className="text-neutral-400 text-[11px]">Click "Run Data Extraction Engine" above to trigger structured text collection or load a default profile.</p>
                           </div>
                         </div>
-
-                        <button
-                          onClick={() => setAppMode('analyst')}
-                          className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-indigo-700"
-                        >
-                          <TrendingDown className="h-4 w-4" />
-                          <span>Analyze Price Signals in Price Monitor ➔</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: JSON Schema */}
-                {activeTab === 'json' && (
-                  <div className="space-y-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block px-1">Extracted Structured JSON</span>
-                    {currentResult?.extractedData ? (
-                      <JsonViewer jsonObj={currentResult.extractedData} />
-                    ) : (
-                      <div className="border-2 border-dashed border-neutral-200 bg-neutral-50/50 rounded-2xl p-12 text-center text-neutral-500 text-sm min-h-[300px] flex flex-col items-center justify-center">
-                        <Database className="h-8 w-8 text-neutral-400 mb-3" />
-                        <p>Run the extraction tool to compile HTML content into valid JSON.</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: Prompt Compiler */}
-                {activeTab === 'prompt' && (
-                  <div className="space-y-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block px-1">Developer Code Compilation</span>
-                    <PromptPlayground 
-                      htmlSnippet={htmlContent} 
-                      customFields={customFields} 
-                    />
-                  </div>
-                )}
-
-                {/* Tab: History Log */}
-                {activeTab === 'history' && (
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center px-1">
-                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block">Recent Executions</span>
-                      {history.length > 0 && (
-                        <button 
-                          onClick={handleClearHistory}
-                          className="text-xs text-rose-600 hover:underline hover:text-rose-700 font-semibold"
-                        >
-                          Clear All Log
-                        </button>
                       )}
                     </div>
+                  )}
 
-                    {history.length === 0 ? (
-                      <div className="border-2 border-dashed border-neutral-200 bg-neutral-50/50 rounded-2xl p-12 text-center text-neutral-500 text-sm min-h-[300px] flex flex-col items-center justify-center">
-                        <History className="h-8 w-8 text-neutral-400 mb-3 animate-pulse" />
-                        <p>Your extraction history is empty. Recent parser runs will be tracked here locally.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-                        {history.map((item) => (
-                          <div 
-                            key={item.id} 
-                            onClick={() => {
-                              setCurrentResult(item);
-                              setActiveTab('preview');
-                            }}
-                            className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-150 bg-white ${
-                              currentResult?.id === item.id 
-                                ? "border-neutral-900 shadow-sm" 
-                                : "border-neutral-200 hover:border-neutral-300"
-                            }`}
+                  {activeTab === 'json' && (
+                    <JsonViewer 
+                      data={currentResult?.extractedData} 
+                      timestamp={currentResult?.timestamp} 
+                      rawInputLength={currentResult?.rawInputLength} 
+                    />
+                  )}
+
+                  {activeTab === 'prompt' && (
+                    <PromptPlayground 
+                      htmlSample={htmlContent} 
+                      customFields={customFields.filter(f => f.enabled)} 
+                      compiledPrompt={currentResult?.prompt} 
+                    />
+                  )}
+
+                  {activeTab === 'history' && (
+                    <div className="flex-1 flex flex-col justify-between h-full text-xs space-y-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <span className="font-bold text-neutral-700">Cache History Stack</span>
+                        {history.length > 0 && (
+                          <button
+                            onClick={handleClearHistory}
+                            className="text-[10px] font-bold text-red-600 hover:underline flex items-center gap-1"
                           >
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="inline-flex items-center text-[10px] font-mono text-neutral-400">
-                                <Clock className="h-3 w-3 mr-1" /> {item.timestamp}
-                              </span>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
-                                item.success 
-                                  ? "bg-emerald-50 text-emerald-800 border border-emerald-100" 
-                                  : "bg-rose-50 text-rose-800 border border-rose-100"
-                              }`}>
-                                {item.success ? "Success" : "Failed"}
-                              </span>
-                            </div>
-
-                            <h4 className="text-xs font-semibold text-neutral-800 line-clamp-2">
-                              {item.extractedData?.productTitle || "Failed Extraction Result"}
-                            </h4>
-
-                            {item.success && item.extractedData && (
-                              <div className="flex items-center gap-2 mt-2 text-[10px] text-neutral-500 font-mono">
-                                <span>Price: <b className="text-neutral-700">{item.extractedData.currentPrice !== null ? `${item.extractedData.currentPrice} ${item.extractedData.currencyCode}` : "N/A"}</b></span>
-                                <span>•</span>
-                                <span>Analyzed: <b className="text-neutral-700">{item.rawInputLength.toLocaleString()} chars</b></span>
-                              </div>
-                            )}
-
-                            {item.error && (
-                              <p className="text-[10px] text-rose-600 mt-1 truncate">{item.error}</p>
-                            )}
-                          </div>
-                        ))}
+                            <Trash2 className="h-3 w-3" /> Reset Storage Logs
+                          </button>
+                        )}
                       </div>
-                    )}
-                  </div>
-                )}
 
+                      {history.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center text-neutral-400 py-12">
+                          <History className="h-5 w-5 text-neutral-300 mb-2" />
+                          <p className="font-medium text-[11px]">No local cache instances discovered.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                          {history.map((hist) => (
+                            <button
+                              key={hist.id}
+                              onClick={() => setCurrentResult(hist)}
+                              className={`w-full text-left p-3 rounded-xl border text-[11px] flex items-center justify-between transition-all ${
+                                currentResult?.id === hist.id
+                                  ? 'border-neutral-900 bg-neutral-900 text-white'
+                                  : 'border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-800'
+                              }`}
+                            >
+                              <div className="space-y-0.5 max-w-[85%]">
+                                <p className="font-bold tracking-tight truncate">
+                                  {hist.success ? hist.extractedData?.productTitle : `Failed Thread log (${hist.error})`}
+                                </p>
+                                <div className="flex items-center space-x-2 text-[10px] opacity-75">
+                                  <span className="font-mono flex items-center gap-0.5"><Clock className="h-2.5 w-2.5" /> {hist.timestamp}</span>
+                                  <span>•</span>
+                                  <span>{(hist.rawInputLength / 1024).toFixed(1)} KB HTML input</span>
+                                </div>
+                              </div>
+                              <ChevronRight className="h-3.5 w-3.5 opacity-60" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-
             </section>
-
           </div>
         ) : appMode === 'analyst' ? (
-          /* New Price Intelligence Analyst Layout */
+          /* Price Analyst Mode */
           <PriceIntelligence 
-            onAnalyzeComplete={() => {}}
-            extractedTitle={currentResult?.extractedData?.productTitle}
-            extractedPrice={currentResult?.extractedData?.currentPrice}
-            extractedCurrency={currentResult?.extractedData?.currencyCode}
+            extractedProduct={currentResult?.extractedData || null} 
+            onNavigateToTracker={handleTransferToTracker}
           />
         ) : (
-          /* New Alerts Tracker Layout */
-          <AlertsTracker 
+          /* 24/7 Automated Pricing Alerts Module */
+          <AlertsTracker
             trackedProducts={trackedProducts}
             alertLogs={alertLogs}
-            isFetchingTracker={isFetchingTracker}
+            isFetching={isFetchingTracker}
             isTriggeringCron={isTriggeringCron}
             trackerError={trackerError}
             trackTitle={trackTitle}
@@ -1122,32 +1051,20 @@ export default function App() {
             trackHtml={trackHtml}
             setTrackHtml={setTrackHtml}
             trackMessage={trackMessage}
-            setTrackMessage={setTrackMessage}
             handleAddTrackedProduct={handleAddTrackedProduct}
             handleToggleProduct={handleToggleProduct}
             handleDeleteProduct={handleDeleteProduct}
             handleSimulatePrice={handleSimulatePrice}
             handleTriggerCron={handleTriggerCron}
-            fetchTrackerData={fetchTrackerData}
+            selectedLog={selectedLog}
+            setSelectedLog={setSelectedLog}
           />
         )}
-
       </main>
 
-      {/* Footer information bar */}
-      <footer className="bg-white border-t border-neutral-200 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <div className="flex items-center space-x-2">
-            <ShoppingBag className="h-4 w-4 text-neutral-400" />
-            <span>© 2026 E-commerce Intelligence Suite. All rights reserved.</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-neutral-300">|</span>
-            <span>API: <b className="text-neutral-700">@google/genai (v2.4.0)</b></span>
-            <span className="text-neutral-300">|</span>
-            <span>Client: <b className="text-neutral-700">React + Vite</b></span>
-          </div>
-        </div>
+      {/* global UI footer watermark */}
+      <footer className="border-t border-neutral-200 bg-white py-6 mt-12 text-center text-xs text-neutral-400 font-medium">
+        <p>© 2026 E-Commerce Intelligence Dashboard. Integrated with Gemini 3.5 Flash server pipelines via client JSON constraints.</p>
       </footer>
     </div>
   );
